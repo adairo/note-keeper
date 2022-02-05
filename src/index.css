@@ -1,7 +1,11 @@
 html {
     font-size: 10px;
     font-family: sans-serif;
+    --primary-light: #ffe97d;
+    --primary: #ffb74d;
+    --primary-dark: #c88719
 }
+
 .notes-container {
     display: flex;
     flex-direction: column;
@@ -11,13 +15,15 @@ html {
 }
 
 .note {
-    background-color: #eee;
+    background-color: var(--primary-light);
     border-radius: 1rem;
     padding: 2rem;
+    border: 1px solid var(--primary-dark)
 }
 
 .note-info{
     margin: 0;
+    position: relative;
 }
 
 .note-title {
@@ -39,11 +45,50 @@ html {
     font-size: 2rem;
     background: none;
     border-radius: 1rem;
-    background-color: antiquewhite;
+    background-color: var(--primary);
     border: none;
     cursor: pointer;
+    border: 1px solid var(--primary-dark)
+
 }
 
 .new-note-button:hover {
     background-color: rgb(255, 223, 181);
+}
+
+.three-dot-button {
+    position: absolute;
+    right: -1rem;
+    cursor: pointer;
+    padding: 0.1rem 0.6rem;
+}
+
+.dot {
+    background-color: var(--primary-dark);
+    width: 0.5rem;
+    aspect-ratio: 1;
+    margin-bottom: 0.2rem;
+    border-radius: 1rem;
+}
+
+.pop-up-menu {
+    position: absolute;
+    right: 1rem;
+    top: -0.5rem;
+    font-size: 1.7rem;
+    display: none;
+    flex-direction: column;
+    width: 6rem;
+    background-color: var(--primary);
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+.pop-up-menu.active {
+    display: flex;
+}
+
+.pop-up-option {
+    margin-bottom: 0.2rem;
+    cursor: pointer;
 }
