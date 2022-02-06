@@ -2,35 +2,40 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+function *generateId() {
+  let id = 0;
+  while (true)
+    yield ++id
+}
+const idGenerator = generateId();
+
 function PopUpMenu(props) {
   return (
     <div
       className={`pop-up-menu ${props.active ? "active" : ""}`}
       tabIndex={"0"}
     >
-      <option className="pop-up-option" onClick={props.handleDelete}>
+      <option className="pop-up-option delete" onClick={props.onDelete}>
         Delete
       </option>
-      <option className="pop-up-option">Edit</option>
+      {/* <option className="pop-up-option">Edit</option> */}
     </div>
   );
 }
 
+
 class Note extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      title: "New title",
-      date: new Date(),
-      content: "Enter your text here",
-      showingPopUp: false,
-    };
+    this.state = {showingPopUp: false}
+
+    this.handleToggleMenu = this.handleToggleMenu.bind(this)
   }
 
   handleToggleMenu() {
-    this.setState({
-      showingPopUp: !this.state.showingPopUp,
-    });
+    this.setState(state => {
+      return {showingPopUp: !state.showingPopUp}
+    })
   }
 
   handleTitleInput(e) {
@@ -43,34 +48,30 @@ class Note extends React.Component {
   }
 
   render() {
-    const [day, month, year] = [
-      this.props.date.getDate(),
-      this.props.date.getMonth(),
-      this.props.date.getFullYear(),
-    ];
+    const date = this.props.date.toLocaleString();
 
     return (
       <li className="note">
         <div className="note-info">
 
-        <ThreeDotButton onClick={this.handleToggleMenu.bind(this)}/>
+        <ThreeDotButton onClick={this.handleToggleMenu}/>
 
           <PopUpMenu
             active={this.state.showingPopUp}
-            handleDelete={() => this.props.handleDelete(this.props.noteId)}>
+            onDelete={() => this.props.onDelete(this.props.id)}>
           </PopUpMenu>
 
           <div 
             className="note-title" 
-            contentEditable={true}
+            // contentEditable={true}
             onInput={(e) => {this.handleTitleInput(e)}}
           >
-            {this.state.title}</div>
+            {this.props.title}</div>
           <div className="note-date">
-            created on {day}/{month}/{year}
+            created on {date}
           </div>
         </div>
-        <div className="note-content" contentEditable={true}>{this.state.content}</div>
+        <div className="note-content" >{this.props.content}</div>
       </li>
     );
   }
@@ -86,20 +87,27 @@ function ThreeDotButton(props) {
   );
 }
 
-class Notes extends React.Component {
+class NotesContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      notes: [],
+      notes: [{
+        title: "hi",
+        date: new Date(),
+        content: "content",
+        id: 12
+      }],
     };
+
+    this.deleteNote = this.deleteNote.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
-  handleDeleteNote(noteId) {
+  deleteNote(noteId) {
     const notes = [...this.state.notes];
-    // const noteId = this.props.noteId;
+    const index = notes.findIndex(note => note.id === noteId)
+    notes.splice(index, 1);
 
-    notes.splice(noteId, 1);
-    console.log(notes)
     this.setState({
       notes: notes,
     });
@@ -111,6 +119,7 @@ class Notes extends React.Component {
       title: "Title",
       date: new Date(),
       content: "Enter text",
+      id: idGenerator.next().value
     };
     notes.push(newNote);
     this.setState({
@@ -119,24 +128,23 @@ class Notes extends React.Component {
   }
 
   render() {
-    const notesComponents = this.state.notes.map((note, index) => {
+    const notesComponents = this.state.notes.map( note => {
       return (
         <Note
-          title={note.title}
-          date={note.date}
-          content={note.content}
-          key={index}
-          noteId={index}
-          handleDelete={this.handleDeleteNote.bind(this)}
+          // spread all the note properties, like title, date, etc.
+          {...note} 
+          key={note.id}
+          onDelete={this.deleteNote}
         />
       );
     });
     return (
       <ul className="notes-container">
         {notesComponents}
+
         <button
           className="new-note-button"
-          onClick={(e) => this.handleButtonClick(e)}
+          onClick={this.handleButtonClick}
         >
           New note
         </button>
@@ -146,7 +154,7 @@ class Notes extends React.Component {
 }
 
 function App() {
-  return <Notes />;
+  return <NotesContainer />;
 }
 
 ReactDOM.render(<App />, document.getElementById("root"));
