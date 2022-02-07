@@ -27,19 +27,25 @@ class Note extends React.Component {
     super(props);
     this.state = { showingPopUp: false };
 
-    this.handleToggleMenu = this.handleToggleMenu.bind(this);
-    this.handleUpdateTitle = this.handleUpdateTitle.bind(this);
+    this.handleMenuToggle = this.handleMenuToggle.bind(this);
+    this.handleTitleUpdate = this.handleTitleUpdate.bind(this);
+    this.handleContentUpdate = this.handleContentUpdate.bind(this);
   }
 
-  handleToggleMenu() {
+  handleMenuToggle() {
     this.setState((state) => {
       return { showingPopUp: !state.showingPopUp };
     });
   }
 
-  handleUpdateTitle(e) {
+  handleTitleUpdate(e) {
     const title = e.target.value;
-    this.props.onUpdateTitle(this.props.id, title)
+    this.props.onTitleUpdate(this.props.id, title)
+  }
+
+  handleContentUpdate(e) {
+    const content = e.target.textContent;
+    this.props.onContentUpdate(this.props.id, content)
   }
 
   render() {
@@ -48,31 +54,30 @@ class Note extends React.Component {
     return (
       <div className="note">
         <div className="note-info">
-          <ThreeDotButton onClick={this.handleToggleMenu} />
+          <ThreeDotButton onClick={this.handleMenuToggle} />
 
           <PopUpMenu
             active={this.state.showingPopUp}
-            onDelete={() => this.props.onDelete(this.props.id)}
-          ></PopUpMenu>
-
+            onDelete={() => this.props.onDelete(this.props.id)} 
+          />
+          
           <input
             className="note-title"
             type="text"
             value={this.props.title}
-            onChange={this.handleUpdateTitle}
+            onChange={this.handleTitleUpdate}
             placeholder="Title"
           />
 
-          <div className="note-date">created on {date}</div>
+          <div className="note-date">{date}</div>
         </div>
-        <textarea 
+        <p 
           className="note-content" 
-          placeholder="Enter text"
-          rows="2"
-          value={this.props.content}
+          contentEditable="true"
+          onChange={this.handleContentUpdate}
         >
-          
-        </textarea>
+          {this.props.content}
+        </p>
         </div>
     );
   }
@@ -104,8 +109,10 @@ class NotesContainer extends React.Component {
     };
 
     this.updateTitle = this.updateTitle.bind(this);
+    this.updateContent = this.updateContent.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
+
   }
 
   deleteNote(noteId) {
@@ -138,7 +145,14 @@ class NotesContainer extends React.Component {
     current.title = title;
 
     this.setState({ notes });
+  }
 
+  updateContent(id, content) {
+    const notes = [...this.state.notes];
+    const current = notes.find(note => note.id === id);
+    current.content = content;
+
+    this.setState({ notes });
   }
 
   render() {
@@ -149,7 +163,8 @@ class NotesContainer extends React.Component {
           {...note}
           key={note.id}
           onDelete={this.deleteNote}
-          onUpdateTitle={this.updateTitle}
+          onTitleUpdate={this.updateTitle}
+          onContentUpdate={this.updateContent}
         />
       );
     });
