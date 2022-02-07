@@ -2,10 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-function *generateId() {
+function* generateId() {
   let id = 0;
-  while (true)
-    yield ++id
+  while (true) yield ++id;
 }
 const idGenerator = generateId();
 
@@ -23,56 +22,58 @@ function PopUpMenu(props) {
   );
 }
 
-
 class Note extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {showingPopUp: false}
+    this.state = { showingPopUp: false };
 
-    this.handleToggleMenu = this.handleToggleMenu.bind(this)
+    this.handleToggleMenu = this.handleToggleMenu.bind(this);
+    this.handleUpdateTitle = this.handleUpdateTitle.bind(this);
   }
 
   handleToggleMenu() {
-    this.setState(state => {
-      return {showingPopUp: !state.showingPopUp}
-    })
+    this.setState((state) => {
+      return { showingPopUp: !state.showingPopUp };
+    });
   }
 
-  handleTitleInput(e) {
-    const newTitle = e.target.textContent.trim();
-    console.log(newTitle)
-
-    this.setState({
-      title: newTitle
-    })
+  handleUpdateTitle(e) {
+    const title = e.target.value;
+    this.props.onUpdateTitle(this.props.id, title)
   }
 
   render() {
     const date = this.props.date.toLocaleString();
 
     return (
-      <li className="note">
+      <div className="note">
         <div className="note-info">
-
-        <ThreeDotButton onClick={this.handleToggleMenu}/>
+          <ThreeDotButton onClick={this.handleToggleMenu} />
 
           <PopUpMenu
             active={this.state.showingPopUp}
-            onDelete={() => this.props.onDelete(this.props.id)}>
-          </PopUpMenu>
+            onDelete={() => this.props.onDelete(this.props.id)}
+          ></PopUpMenu>
 
-          <div 
-            className="note-title" 
-            // contentEditable={true}
-            onInput={(e) => {this.handleTitleInput(e)}}
-          >
-            {this.props.title}</div>
-          <div className="note-date">
-            created on {date}
-          </div>
+          <input
+            className="note-title"
+            type="text"
+            value={this.props.title}
+            onChange={this.handleUpdateTitle}
+            placeholder="Title"
+          />
+
+          <div className="note-date">created on {date}</div>
         </div>
-        <div className="note-content" >{this.props.content}</div>
-      </li>
+        <textarea 
+          className="note-content" 
+          placeholder="Enter text"
+          rows="2"
+          value={this.props.content}
+        >
+          
+        </textarea>
+        </div>
     );
   }
 }
@@ -91,21 +92,25 @@ class NotesContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      notes: [{
-        title: "hi",
-        date: new Date(),
-        content: "content",
-        id: 12
-      }],
+      notes: [
+        {
+          title: "Note title",
+          date: new Date(),
+          content:
+          "Lorem, ipsum dolor sit amet consectetur adipisicing elit.",
+          id: idGenerator.next().value,
+        },
+      ],
     };
 
+    this.updateTitle = this.updateTitle.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
   }
 
   deleteNote(noteId) {
     const notes = [...this.state.notes];
-    const index = notes.findIndex(note => note.id === noteId)
+    const index = notes.findIndex((note) => note.id === noteId);
     notes.splice(index, 1);
 
     this.setState({
@@ -116,10 +121,10 @@ class NotesContainer extends React.Component {
   handleButtonClick(e) {
     const notes = [...this.state.notes];
     const newNote = {
-      title: "Title",
+      title: "",
       date: new Date(),
-      content: "Enter text",
-      id: idGenerator.next().value
+      content: "",
+      id: idGenerator.next().value,
     };
     notes.push(newNote);
     this.setState({
@@ -127,14 +132,24 @@ class NotesContainer extends React.Component {
     });
   }
 
+  updateTitle(id, title) {
+    const notes = [...this.state.notes];
+    const current = notes.find(note => note.id === id);
+    current.title = title;
+
+    this.setState({ notes });
+
+  }
+
   render() {
-    const notesComponents = this.state.notes.map( note => {
+    const notesComponents = this.state.notes.map((note) => {
       return (
         <Note
           // spread all the note properties, like title, date, etc.
-          {...note} 
+          {...note}
           key={note.id}
           onDelete={this.deleteNote}
+          onUpdateTitle={this.updateTitle}
         />
       );
     });
@@ -142,10 +157,7 @@ class NotesContainer extends React.Component {
       <ul className="notes-container">
         {notesComponents}
 
-        <button
-          className="new-note-button"
-          onClick={this.handleButtonClick}
-        >
+        <button className="new-note-button" onClick={this.handleButtonClick}>
           New note
         </button>
       </ul>

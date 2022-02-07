@@ -18,7 +18,7 @@ html {
     background-color: var(--primary-light);
     border-radius: 1rem;
     padding: 2rem;
-    border: 1px solid var(--primary-dark)
+    border: 1px solid var(--primary-dark);    
 }
 
 .note-info{
@@ -30,6 +30,9 @@ html {
     font-size: 2.5rem;
     color: rgb(20, 20, 20);
     font-weight: bold;
+    background: none;
+    border: none;
+    outline: none;
 }
 
 .note-date {
@@ -37,7 +40,14 @@ html {
 }
 
 .note-content {
+    width: 100%;
+    margin-top: 0.6rem;
     font-size: 1.8rem;
+    background: none;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow: auto;
 }
 
 .new-note-button {
