@@ -92,7 +92,7 @@ html {
     right: 1rem;
     top: -0.5rem;
     font-size: 1.7rem;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0.4rem;
     background-color: white;
@@ -101,9 +101,9 @@ html {
     box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.089);
 }
 
-.pop-up-menu.active {
+/* .pop-up-menu.active {
     display: flex;
-}
+} */
 
 .pop-up-option {
     cursor: pointer;

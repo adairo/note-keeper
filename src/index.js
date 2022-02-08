@@ -8,34 +8,50 @@ function* generateId() {
 }
 const idGenerator = generateId();
 
-function PopUpMenu(props) {
-  return (
-    <div
-      className={`pop-up-menu ${props.active ? "active" : ""}`}
-      tabIndex={"0"}
-    >
-      <option className="pop-up-option delete" onClick={props.onDelete}>
-        Delete
-      </option>
-      {/* <option className="pop-up-option">Edit</option> */}
-    </div>
-  );
+class PopUpMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.popUpMenu = React.createRef();
+  }
+
+  componentDidMount() {
+    this.popUpMenu.current.focus();
+  }
+  render() {
+    return (
+      <div
+        ref={this.popUpMenu}
+        className={`pop-up-menu`}
+        tabIndex={"0"}
+        onBlur={this.props.onClose}
+      >
+        <option className="pop-up-option delete" onClick={this.props.onDelete}>
+          Delete
+        </option>
+        {/* <option className="pop-up-option">Edit</option> */}
+      </div>
+    );
+  }
 }
 
 class Note extends React.Component {
   constructor(props) {
     super(props);
     this.state = { showingPopUp: false };
+    this.popUpMenu = React.createRef();
 
-    this.handleMenuToggle = this.handleMenuToggle.bind(this);
+    this.handleOpenMenu = this.handleOpenMenu.bind(this);
+    this.handleCloseMenu = this.handleCloseMenu.bind(this);
     this.handleTitleUpdate = this.handleTitleUpdate.bind(this);
     this.handleContentUpdate = this.handleContentUpdate.bind(this);
   }
 
-  handleMenuToggle() {
-    this.setState((state) => {
-      return { showingPopUp: !state.showingPopUp };
-    });
+  handleOpenMenu() {
+    this.setState({ showingPopUp: true });
+  }
+
+  handleCloseMenu() {
+    this.setState({ showingPopUp: false });
   }
 
   handleTitleUpdate(e) {
@@ -55,12 +71,15 @@ class Note extends React.Component {
     return (
       <div className="note">
         <div className="note-info">
-          <ThreeDotButton onClick={this.handleMenuToggle} />
-
-          <PopUpMenu
-            active={this.state.showingPopUp}
-            onDelete={() => this.props.onDelete(this.props.id)}
-          />
+          <ThreeDotButton onClick={this.handleOpenMenu} />
+          {this.state.showingPopUp && (
+            <PopUpMenu
+              ref={this.popUpMenu}
+              active={this.state.showingPopUp}
+              onDelete={() => this.props.onDelete(this.props.id)}
+              onClose={this.handleCloseMenu}
+            />
+          )}
 
           <input
             className="note-title"
@@ -85,7 +104,7 @@ class Note extends React.Component {
 
 function ThreeDotButton(props) {
   return (
-    <div className="three-dot-button" onClick={props.onClick}>
+    <div className="three-dot-button" onClick={props.onClick} tabIndex="0">
       <div className="dot"></div>
       <div className="dot"></div>
       <div className="dot"></div>
