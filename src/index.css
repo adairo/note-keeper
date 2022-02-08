@@ -68,8 +68,14 @@ html {
 
 }
 
-.new-note-button:hover {
-    background-color: rgb(255, 223, 181);
+@media (hover: hover) {
+    .new-note-button:hover {
+        background-color: #ffc56f;
+    }
+}
+
+.new-note-button:active {
+    background-color: #ffd392;
 }
 
 .three-dot-button {
